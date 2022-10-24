@@ -1,6 +1,6 @@
 const express = require('express')
 const mongoose      = require('mongoose');
-const bcrypt        = require('bcrypt');
+// const bcrypt        = require('bcrypt');
 const User          = require("../models/User")
 const crypto =  require('crypto')
 
@@ -19,12 +19,12 @@ if (userFound) {
 } else {
     console.log("222222222222222222222");
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    // const hashedPassword = await bcrypt.hash(req.body.password, 10);
     var token = crypto.randomBytes(32).toString('hex');
     const userr = new User({
       name: req.body.name,
       email: req.body.email,
-      password: hashedPassword,
+      password: req.body.password,
       type: "user",
       token: token
     });
@@ -57,10 +57,10 @@ router.post('/login_user', async (req, res) => {
     console.log("inlogin", req.body)
     const username = req.body.username
     const password = req.body.password
-    const user = await User.findOne({email:username})
+    const user = await User.findOne({email:username, password: password})
     if(user) {
-        const isMatch = await bcrypt.compare(password, user.password)
-        if(isMatch) {
+        // const isMatch = await bcrypt.compare(password, user.password)
+        if(user) {
             res.send({
                 success: true,
                 data: user,
@@ -79,7 +79,7 @@ router.post('/login_user', async (req, res) => {
                 
             })
         }
-    }else {
+    }else { 
         res.send({
             success: false,
             message: "no user with this username exits"
