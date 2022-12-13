@@ -5,6 +5,8 @@ const User          = require("../models/User")
 const crypto =  require('crypto')
 
 const router = express.Router()
+
+
 router.post('/signup', async (req, res) => {
 console.log("herrer in signup");
 console.log("sdfsdfsdf", req.body)
@@ -23,6 +25,9 @@ if (userFound) {
     var token = crypto.randomBytes(32).toString('hex');
     const userr = new User({
       name: req.body.name,
+      foculty: req.body.foculty,
+      minxada: req.body.minxada,
+      phoneNo: req.body.phoneNo,
       email: req.body.email,
       password: req.body.password,
       type: "user",
@@ -86,5 +91,51 @@ router.post('/login_user', async (req, res) => {
         })
     }
 });
+
+router.put('/update/:userId', async (req, res) =>{
+
+       const users= User.findByIdAndUpdate({_id : req.body.userId}, {
+        name: req.body.name,
+        foculty: req.body.foculty,
+        minxada: req.body.minxada,
+        phoneNo: req.body.phoneNo,
+        email: req.body.email,
+        password: req.body.password,
+        type: "user",
+        token: token,
+
+
+            new:true,
+        })
+        .then(users=>{
+            res.json(users)
+        })
+        .catch(err=>{
+            res.json(err)
+        })
+    }),
+
+
+router.get('/getUsers', (req, res) => {
+    User.find((err, userrs) =>{
+        if(err){
+            res.send("error not found", err);
+        }
+        else{
+            res.json(userrs)
+        }
+    })
+
+    } 
+    
+),
+
+router.delete('/delete/:userID', async (req, res) => {
+ User.deleteOne({_id : req.body.userID})
+    .then(()=>res.json({message :"User Deleted"}))
+    .catch((err)=> res.send(err));
+    } 
+    
+),
 
 module.exports = router;
