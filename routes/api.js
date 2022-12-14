@@ -92,28 +92,28 @@ router.post('/login_user', async (req, res) => {
     }
 });
 
-router.put('/update/:userId', async (req, res) =>{
+// router.put('/update/:userId', async (req, res) =>{
 
-       const users= User.findByIdAndUpdate({_id : req.body.userId}, {
-        name: req.body.name,
-        foculty: req.body.foculty,
-        minxada: req.body.minxada,
-        phoneNo: req.body.phoneNo,
-        email: req.body.email,
-        password: req.body.password,
-        type: "user",
-        token: token,
+//        const users= User.findByIdAndUpdate({_id : req.body.userId}, {
+//         name: req.body.name,
+//         foculty: req.body.foculty,
+//         minxada: req.body.minxada,
+//         phoneNo: req.body.phoneNo,
+//         email: req.body.email,
+//         password: req.body.password,
+//         type: "user",
+//         token: token,
 
 
-            new:true,
-        })
-        .then(users=>{
-            res.json(users)
-        })
-        .catch(err=>{
-            res.json(err)
-        })
-    }),
+//             new:true,
+//         })
+//         .then(users=>{
+//             res.json(users)
+//         })
+//         .catch(err=>{
+//             res.json(err)
+//         })
+//     }),
 
 
 router.get('/getUsers', (req, res) => {
@@ -130,12 +130,53 @@ router.get('/getUsers', (req, res) => {
     
 ),
 
-router.delete('/delete/:userID', async (req, res) => {
- User.deleteOne({_id : req.body.userID})
-    .then(()=>res.json({message :"User Deleted"}))
-    .catch((err)=> res.send(err));
-    } 
-    
-),
+router.put('/update/:userID', async (req, res, next) => {
+
+  const updateUsers = User.findOneAndUpdate(
+      { _id: req.params.userID },
+      {
+        $set: {
+          name: req.body.name,
+          foculty: req.body.foculty,
+          minxada: req.body.minxada,
+          phoneNo: req.body.phoneNo,
+          email: req.body.email,
+          password: req.body.password,
+        },
+      },
+      { new: true },
+      (err, users) => {
+        if (err) {
+          res.send(err);
+        } else res.json({message : " users updated sucessfully"});
+      }
+    );
+  });
+  
+
+router.delete('/deleteUsers/:id', async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const users = await User.findOne({
+        _id: id,
+      });
+  
+      // users does not exist
+      if (!users) {
+        return next();
+      }
+      await users.remove({
+        _id: id,
+      });
+  
+      res.json({
+        message: 'Employee has been deleted',
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+  
+
 
 module.exports = router;
