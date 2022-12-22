@@ -3,9 +3,10 @@ const mongoose      = require('mongoose');
 // const bcrypt        = require('bcrypt');
 const User          = require("../models/User")
 const crypto =  require('crypto')
-
+const multer = require("multer");
 const router = express.Router()
-
+const Post = require("../models/Post")
+const QrCode = require("../models/QrCode")
 
 router.post('/signup', async (req, res) => {
 console.log("herrer in signup");
@@ -92,8 +93,6 @@ router.post('/login_user', async (req, res) => {
     }
 });
 
-// router.put('/update/:userId', async (req, res) =>{
-
 //        const users= User.findByIdAndUpdate({_id : req.body.userId}, {
 //         name: req.body.name,
 //         foculty: req.body.foculty,
@@ -170,13 +169,148 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
       });
   
       res.json({
-        message: 'Employee has been deleted',
+        message: 'User has been deleted',
       });
     } catch (error) {
       next(error);
     }
   });
-  
 
+//   var storage = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//        cb(null, 'test');
+//     },
+//     filename: function (req, file, cb) {
+//        cb(null, Date.now() + '-' + file.originalname);
+//     }
+//  });
+
+//  var upload = multer({ storage: storage });
+//  app.use(express.static(__dirname+'public/'));
+//  app.use('/test', express.static('test'));
+ 
+
+  // var storage = multer.diskStorage({ 
+  //   destination: function(req, file, cb) { 
+  //       cb(null, 'uploads/') 
+  //   }, 
+  //   filename:function (req, file, cb){ 
+  //       cb(null, file.fieldname + '-' + Date.now()) 
+  //   } 
+  // }); 
+  
+  // var upload = multer({ storage: storage,
+  // fileFilter : function(req, file, callback){
+  //   if(
+  //     file.mimetype == "image/png" || file.mimetype == "image/jpg" || file.mimetype == "image/jpeg"
+  //   ){
+   
+  //     callback(null , true)
+  //   }else{
+  //     console.log("only png , jpg and jpeg supported")
+  //     callback(null , false)
+  //   }
+  // },
+  // limits :{
+  //   fileSize : 1024 *1024 *2
+  // }
+  
+  // });
+  
+  router.post('/posts',async (req, res) => {
+    console.log("Post are Here");
+  //   const obj = {
+  //     img: {
+  //         data: fs.readFileSync(path.join(__dirname + "/uploads/" + req.file.filename)),
+  //         contentType: "image/png"
+  //     }
+  // }
+      try {
+
+        const postss = new Post({
+          // name: req.body.name,
+          text: req.body.text,
+          // image :req.file.path
+          // images: obj.img,  
+        });
+      
+        await postss.save();
+        console.log("yesssssssssssssss");
+        res.send({
+            success: true,
+            record:{
+                success: "true"
+            }
+           
+        })
+      } catch (error) {
+        console.log("nooooooooo", error);
+        res.send({
+            success: false,
+            message: "wrong",
+            record:{
+                success: "false"
+            }
+        })
+        
+      }
+    } );
+
+    
+    router.get('/getPosts', (req, res) => {
+        Post.find((err, posts) =>{
+            if(err){
+                res.send("error not found", err);
+            }
+            else{
+                res.json(posts)
+            }
+        })
+    
+        } 
+        
+    ),
+  router.post('/getminxa', async (req, res, next) => {
+    console.log("the bodyyyyyyy", req.body);
+    
+       User.find({minxada: Number(req.body.minxada)}).then((data) => {
+        res.json({
+          data: data
+        })
+      })
+ 
+     
+    })
+
+    router.post('/qrCode',async (req, res) => {
+      console.log("Post are Here");
+        try {
+  
+          const qr = new QrCode({
+            QrCode: req.body.QrCode,
+        
+          });
+        
+          await qr.save();
+          console.log("yesssssssssssssss");
+          res.send({
+              success: true,
+              record:{
+                  success: "true"
+              }
+             
+          })
+        } catch (error) {
+          console.log("nooooooooo", error);
+          res.send({
+              success: false,
+              message: "wrong",
+              record:{
+                  success: "false"
+              }
+          })
+          
+        }
+      } );
 
 module.exports = router;

@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const cookieSession = require("cookie-session");
 const mongoose = require("mongoose")
 const Api = require('./Routes/api');
+// const post_Api = require('./routes/post_Api')
 const app = express();
 mongoose.set('strictQuery', true);
 // var corsOptions = {
@@ -20,7 +21,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 // simple route
 app.use('/api', Api)
-
+// app.use('hostApi', post_Api)
 const url = "mongodb://127.0.0.1:27017/HSFdb"
 mongoose.connect(url).then((ans) => {
     console.log("ConnectedSuccessful")
