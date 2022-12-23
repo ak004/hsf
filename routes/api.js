@@ -283,7 +283,7 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
     })
 
     router.post('/qrCode',async (req, res) => {
-      console.log("Post are Here");
+      console.log("Qr Here");
         try {
   
           const qr = new QrCode({
@@ -292,8 +292,10 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
           });
         
           await qr.save();
+          qr.createdAt
           console.log("yesssssssssssssss");
           res.send({
+            data :qr,
               success: true,
               record:{
                   success: "true"
@@ -313,4 +315,16 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
         }
       } );
 
+
+      router.post('/getQrInfo', async (req, res, next) => {
+        console.log("the bodyyyyyyy", req.body);
+        
+           QrCode.find({qrCode:req.body.qrCode}).then((data) => {
+            res.json({
+              data: data
+            })
+          })
+     
+         
+        })
 module.exports = router;
