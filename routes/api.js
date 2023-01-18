@@ -7,6 +7,9 @@ const multer = require("multer");
 const router = express.Router()
 const Post = require("../models/Post")
 const QrCode = require("../models/QrCode")
+const Status = require("../models/Status")
+const Attendence = require("../models/Attendence")
+
 
 router.post('/signup', async (req, res) => {
 console.log("herrer in signup");
@@ -283,19 +286,75 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
     })
 
     router.post('/qrCode',async (req, res) => {
+      console.log("%%%%%%%%%%%%%5", req.body);
       console.log("Qr Here");
         try {
   
-          const qr = new QrCode({
-            QrCode: req.body.QrCode,
+          // const qr = new QrCode({
+          //   qrCode: Number(req.body.qrCode),
+            
+          // });
+        
+          // await qr.save();
+          QrCode.findOneAndUpdate({type: 1}, {qrCode: Number(req.body.qrCode)}).then((data) => {
+            if(data) {
+              res.send({
+                data :data,
+                  success: true,
+                  record:{
+                      success: "true"
+                  }
+                 
+              })
+            }
+          })
+
+       
+          console.log("yesssssssssssssss");
+       
+        } catch (error) {
+          console.log("nooooooooo", error);
+          res.send({
+              success: false,
+              message: "wrong",
+              record:{
+                  success: "false"
+              }
+          })
+          
+        }
+      } );
+
+
+      router.post('/getQrInfo', async (req, res, next) => {
+        console.log("the bodyyyyyyy", req.body);
+        
+           QrCode.findOne({type :1}).then((data) => {
+            res.json({
+              data: data
+            })
+          })
+     
+         
+        }),
+
+        
+
+    router.post('/status',async (req, res) => {
+      console.log("status Here");
+        try {
+  
+          const stTus = new Status({
+            accept: req.body.accept,
+            reject:req.body.reject,
         
           });
         
-          await qr.save();
-          qr.createdAt
+          await stTus.save();
+          // qr.createdAt
           console.log("yesssssssssssssss");
           res.send({
-            data :qr,
+            data :stTus,
               success: true,
               record:{
                   success: "true"
@@ -314,17 +373,41 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
           
         }
       } );
-
-
-      router.post('/getQrInfo', async (req, res, next) => {
-        console.log("the bodyyyyyyy", req.body);
-        
-           QrCode.find({qrCode:req.body.qrCode}).then((data) => {
-            res.json({
-              data: data
-            })
+      
+    router.post('/qrData',async (req, res) => {
+      // code iyo user_id
+      console.log(req.body)
+      QrCode.findOne({qrCode: Number(req.body.qrCode)}).then((found) => {
+        if(found) {
+          User.findOne({_id: req.body.user_id}).then((user) => {
+            if(user) {
+              const userr = new User({
+                user_id: user._id,
+                user_name: user.name,
+                user_phone: user.phoneNo
+              })
+              userr.save().then((data) => {
+                req.json({
+                  success: true,
+                  data: data
+                })
+              })
+            }
           })
-     
-         
-        })
+        }else{
+          // wromg qrcode 
+        }
+      })
+
+    });
+
+    // router.get('/qrCodebyid/:qrCodeId' , async (req, res)=>{
+    //   try{
+    //     const qrCode = QrCode.findById(req.params.qrCodeId);
+    //     if(!qrCode) return res.status(404).json({message: 'QrCode not found'});
+    //     res.json({qrCodeData : qrCode.data});
+    //   }catch(err){
+    //     res.status(500).json({message: 'Error finding qrCode'});
+    //   }
+    // })
 module.exports = router;

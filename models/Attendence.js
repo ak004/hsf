@@ -1,22 +1,26 @@
 const mongoose = require("mongoose")
 
-const userSchema = new mongoose.Schema({
-    name: {
+const AttendenceSchema = new mongoose.Schema({
+    user_id: {
         type: String,
         required: true,
     },
-
-    foculty: {
+    user_name: {
         type: String,
         required: true,
     },
-    minxada: {
-        type: Number,
+ 
+    user_phone: {
+        type: String,
         required: true,
     },
+ 
 
+}, 
+{
+    timestamps : true
+}
+)
 
-})
-
-const User = mongoose.model("User",  userSchema)
-module.exports = User;
+const Attendence = mongoose.model("attendence",  AttendenceSchema)
+module.exports = Attendence;
