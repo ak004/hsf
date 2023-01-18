@@ -379,14 +379,16 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
       console.log(req.body)
       QrCode.findOne({qrCode: Number(req.body.qrCode)}).then((found) => {
         if(found) {
+          console.log("correct qr code")
           User.findOne({_id: req.body.user_id}).then((user) => {
             if(user) {
-              const userr = new User({
+              console.log("-----user found---------", user);
+              const present = new Attendence({
                 user_id: user._id,
                 user_name: user.name,
                 user_phone: user.phoneNo
               })
-              userr.save().then((data) => {
+              present.save().then((data) => {
                 req.json({
                   success: true,
                   data: data
