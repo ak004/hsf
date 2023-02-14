@@ -5,6 +5,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+
+    foculty: {
+        type: String,
+        required: true,
+    },
+    minxada: {
+        type: Number,
+        required: true,
+    },
+    phoneNo: {
+        type: Number,
+        required: true,
+    },
     email: {
         type: String,
         required: true,
@@ -31,7 +44,6 @@ const userSchema = new mongoose.Schema({
         type: Array,
         default: []
     }
-
 
 })
 

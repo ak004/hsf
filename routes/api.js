@@ -9,6 +9,7 @@ const Post = require("../models/Post")
 const QrCode = require("../models/QrCode.js")
 const Status = require("../models/Status")
 const Attendence = require("../models/Attendence")
+const path = require("path");
 
 
 router.post('/signup', async (req, res) => {
@@ -196,8 +197,21 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
   // }
   
   // });
+  var storage = multer.diskStorage({
+    destination: './upload',
+    filename: (req, file, cb) => {
+        return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
+    }
+  })
   
-  router.post('/posts',async (req, res) => {
+  const upload = multer({
+    storage: storage,
+    limits: {
+        fileSize: 10000000
+    }
+  })
+  router.use('/image', express.static('upload'));
+  router.post('/posts',upload.single('image'),async (req, res) => {
     console.log("Post are Here");
   //   const obj = {
   //     img: {
@@ -208,12 +222,14 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
       try {
         User.findOne({_id :req.body.user_id}).then((user)=>{
 
+          console.log(user)
+
             const postss = new Post({
                 // name: req.body.name,
                 text: req.body.text,
                 user_id : user._id,
+                image :req.file.path,
                 user_name : user.name,
-                // image :req.file.path
                 // images: obj.img,  
               });
             
@@ -221,6 +237,7 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
               console.log("yesssssssssssssss");
               res.send({
                   success: true,
+                  
                   record:{
                       success: "true"
                   }
@@ -256,6 +273,30 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
         } 
         
     ),
+
+    router.delete('/deletePosts/:id', async (req, res, next) => {
+      try {
+        const { id } = req.params;
+        const posts = await Post.findOne({
+          _id: id,
+        });
+    
+        // users does not exist
+        if (!posts) {
+          return next();
+        }
+        await posts.remove({
+          _id: id,
+        });
+    
+        res.json({
+          message: 'User has been deleted',
+        });
+      } catch (error) {
+        next(error);
+      }
+    });
+  
   router.post('/getminxa', async (req, res, next) => {
     console.log("the bodyyyyyyy", req.body);
     
@@ -328,7 +369,8 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
     
         try {
   
-            User.findOne({_d : req.body.user_id}).then((user)=>{
+            User.findOne({_id : req.body.user_id}).then((user)=>{
+              console.log(user)
         
                 const stTus = new Status({
                     IsAccept :req.body.IsAccept,
@@ -383,7 +425,7 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
     router.post('/qrData',async (req, res) => {
       // code iyo user_id
       console.log(req.body)
-      QrCode.findOne({qrCode: Number(req.body.qrCode)}).then((found) => {
+      QrCode.findOne({qrCode: req.body.qrCode}).then((found) => {
         if(found) {
           console.log("correct qr code")
           User.findOne({_id: req.body.user_id}).then((user) => {
@@ -395,7 +437,7 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
                 user_phone: user.phoneNo
               })
               present.save().then((data) => {
-                req.json({
+                res.json({
                   success: true,
                   data: data
                 })
@@ -422,8 +464,17 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
     
         } 
         
-    ),
+    )
 
+    
+
+// router.post("/upload", upload.single('profile'), (req, res) => {
+
+//   res.json({
+//       success: 1,
+//       profile_url: `http://localhost:4000/profile/${req.file.filename}`
+//   })
+// })
     // router.get('/qrCodebyid/:qrCodeId' , async (req, res)=>{
     //   try{
     //     const qrCode = QrCode.findById(req.params.qrCodeId);
