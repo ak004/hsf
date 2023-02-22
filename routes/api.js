@@ -12,9 +12,26 @@ const Attendence = require("../models/Attendence")
 const path = require("path");
 
 
-router.post('/signup', async (req, res) => {
+
+
+
+var storage = multer.diskStorage({
+  destination: './userImages',
+  filename: (req, file, cb) => {
+      return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
+  }
+})
+
+const uploadUserImage = multer({
+  storage: storage,
+  limits: {
+      fileSize: 10000000
+  }
+})
+router.use('/upload', express.static('upload'));
+router.post('/signup', uploadUserImage.single('profile_pic'),async (req, res) => {
 console.log("herrer in signup");
-console.log("sdfsdfsdf", req.body)
+console.log(req.body)
 const userFound = await User.findOne({ email: req.body.email });
 
 if (userFound) {
@@ -30,10 +47,14 @@ if (userFound) {
     var token = crypto.randomBytes(32).toString('hex');
     const userr = new User({
       name: req.body.name,
+      foculty : req.body.foculty,
+      minxada :req.body.minxada,
+      phoneNo: req.body.phoneNo,
       email: req.body.email,
       password: req.body.password,
       type: "user",
-      token: token
+      token: token,
+      profile_pic :req.file.path,
     });
 
     await userr.save();
@@ -109,6 +130,34 @@ router.get('/getUsers', (req, res) => {
     } 
     
 ),
+
+router.get('/getUserById/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const users = await User.findOne({
+      _id: id,
+    });
+
+    // users does not exist
+    if (!users) {
+      return next();
+    }
+    else{
+      await users
+    }
+    // await posts{
+    //   _id: id,
+    // });
+
+    res.json({
+      message: 'User Found By Id',
+      users
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 router.put('/update/:userID', async (req, res, next) => {
 
@@ -210,7 +259,7 @@ router.delete('/deleteUsers/:id', async (req, res, next) => {
         fileSize: 10000000
     }
   })
-  router.use('/image', express.static('upload'));
+  router.use('/upload', express.static('upload'));
   router.post('/posts',upload.single('image'),async (req, res) => {
     console.log("Post are Here");
   //   const obj = {

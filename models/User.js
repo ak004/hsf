@@ -28,12 +28,12 @@ const userSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        required: true,
+        // required: true,
         default: "user"
     },
     status: {
         type: Number,
-        required: true,
+        // required: true,
         default: 0
     },
     token: {
@@ -41,8 +41,8 @@ const userSchema = new mongoose.Schema({
         default: ""
     },
     profile_pic: {
-        type: Array,
-        default: []
+        type: String,
+        // default: []
     }
 
 })

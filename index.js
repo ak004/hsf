@@ -5,7 +5,7 @@ const cookieSession = require("cookie-session");
 const mongoose = require("mongoose")
 const Api = require('./Routes/api');
 // const post_Api = require('./routes/post_Api')
-const app = express();
+const app = express({limit :"50mb"});
 mongoose.set('strictQuery', true);
 // var corsOptions = {
 //   origin: "http://localhost:8081"
@@ -17,7 +17,7 @@ mongoose.set('strictQuery', true);
 app.use(express.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true , parameterLimit: 50000}));
 app.use(bodyParser.json());
 // simple route
 app.use('/api', Api)
